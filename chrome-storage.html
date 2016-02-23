@@ -1,0 +1,24 @@
+<!--
+
+Use the chrome.storage API to acces local or sync storage in Chrome.
+
+You need to declare "storage" permissions into your manifest file.
+
+  ...
+  "permissions": [
+    "storage"
+  ],
+  ..
+
+-->
+<script src="../lodash/lodash.js"></script>
+<dom-module id="chrome-storage">
+  <template>
+    <style>
+      :host {
+        display: none;
+      }
+    </style>
+  </template>
+  <script src="chrome-storage.js"></script>
+</dom-module>
