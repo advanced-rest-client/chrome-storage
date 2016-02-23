@@ -141,7 +141,11 @@ Polymer({
         value = tmp;
       }
       value = this._wrapValue(value);
+      // preventing auto save on read;
+      var auto = this.auto;
+      this.auto = false;
       this.set('value', value);
+      this.auto = auto;
     }.bind(this));
   },
   /**
