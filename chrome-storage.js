@@ -108,7 +108,7 @@ Polymer({
   },
   _valueChanged: function() {
     if (this.auto) {
-      this.set();
+      this.store();
     }
   },
   /**
