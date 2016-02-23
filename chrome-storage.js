@@ -1,7 +1,40 @@
 'use strict';
-
+/* global _ */
 Polymer({
   is: 'chrome-storage',
+  /**
+   * Fired when data was read from the storage.
+   * It is accessible via `value` property.
+   *
+   * @event read
+   */
+  /**
+   * Fired when error occurred.
+   *
+   * @event error
+   * @param {String} message Error message.
+   */
+  /**
+   * Fired when store data usage has been read.
+   *
+   * @event bytes-used
+   * @param {Number} bytes Number of bytes used by the given key or whole storage.
+   */
+  /**
+   * Fired when data has been stored into the store.
+   *
+   * @event saved
+   */
+  /**
+   * Fired when data has been removed from the store.
+   *
+   * @event removed
+   */
+  /**
+   * Fired when the store has been cleared.
+   *
+   * @event clear
+   */
   properties: {
     /**
      * A storage area to use.
@@ -50,7 +83,19 @@ Polymer({
      * @type {String|Object|Number|Boolean}
      */
     defaultValue: {
-      type: Object
+      type: Object,
+      value: null //undefined returns empty object
+    },
+    /**
+     * If set, it must be a valid function name. It will be called to wrap the object with.
+     *
+     * @example
+     * this.valueAs = 'String';
+     * this.read();
+     * // result would be "2".
+     */
+    valueAs: {
+      type: String
     }
   },
   observers: [
@@ -78,14 +123,14 @@ Polymer({
     } else {
       obj = name;
     }
-    chrome.storage[this.storage].get(obj, (value) => {
+    chrome.storage[this.storage].get(obj, function(value) {
       if (chrome.runtime.lastError) {
         this.fire('error', chrome.runtime.lastError);
         return;
       }
       if (typeof name === 'string') {
         let _arr = _.toPath(name);
-        let tmp = undefined;
+        let tmp;
         _arr.forEach((item) => {
           if (!tmp) {
             tmp = value[item];
@@ -95,8 +140,9 @@ Polymer({
         });
         value = tmp;
       }
+      value = this._wrapValue(value);
       this.set('value', value);
-    });
+    }.bind(this));
   },
   /**
    * Gets the amount of space (in bytes) being used by one or more items.
@@ -165,34 +211,33 @@ Polymer({
       this.fire('clear');
     });
   },
-  /**
-   * Register an alarm listener.
-   * TODO: it isin't working well....
-   */
-  created: function() {
-    var context = this;
-    this._eventFn = (changes, areaName) => {
-      if (this.storage !== areaName) {
-        return;
-      }
-      let name = this.name;
-      debugger;
-      if (!changes.value && !(name in changes)) {
-        this.set('value', changes);
-        return;
-      }
-      if (typeof name === 'string') {
-        this.set('value', this._getPathValue(changes.value.newValue));
-      } else if (name in changes) {
-        this.read('value', changes[name]);
-      }
-    };
-    //chrome.storage.onChanged.addListener(this._eventFn);
-  },
-
-  detached: function() {
-    //chrome.storage.onChanged.removeListener(this._eventFn);
-  },
+  // /**
+  //  * Register an alarm listener.
+  //  * TODO: it isin't working well....
+  //  */
+  // created: function() {
+  //   var context = this;
+  //   this._eventFn = (changes, areaName) => {
+  //     if (this.storage !== areaName) {
+  //       return;
+  //     }
+  //     let name = this.name;
+  //     if (!changes.value && !(name in changes)) {
+  //       this.set('value', changes);
+  //       return;
+  //     }
+  //     if (typeof name === 'string') {
+  //       this.set('value', this._getPathValue(changes.value.newValue));
+  //     } else if (name in changes) {
+  //       this.read('value', changes[name]);
+  //     }
+  //   };
+  //   chrome.storage.onChanged.addListener(this._eventFn);
+  // },
+  //
+  // detached: function() {
+  //   chrome.storage.onChanged.removeListener(this._eventFn);
+  // },
   /**
    * Transform a path from `this.name` to an object with predefined value.
    *
@@ -240,5 +285,34 @@ Polymer({
         return obj;
       }
     }
+  },
+  /**
+   * Wrap a value into an object.
+   * Set a valueAs parameter to make it works.
+   */
+  _wrapValue: function(value) {
+    var fnName = this.valueAs;
+    if (!fnName || value === null || value === undefined) {
+      return value;
+    }
+
+    var inst;
+    if (window[fnName].constructor) {
+      try {
+        inst = new window[fnName](value);
+      } catch (e) {}
+    } else {
+      inst = window[fnName](value);
+    }
+    if (!inst) {
+      return value;
+    }
+    var _keys = Object.getOwnPropertyNames(value);
+    _keys.forEach((item) => {
+      if (!(item in inst)) {
+        inst[item] = value[item];
+      }
+    });
+    return inst;
   }
 });

@@ -26,7 +26,7 @@ chrome.app.runtime.onLaunched.addListener(function() {
       str = permissions.join('","');
     }
     if (str) {
-      permBlock = `, 
+      permBlock = `,
       "permissions": ["${str}"]`;
     }
     return `{
@@ -56,5 +56,5 @@ module.exports = (elementName) => {
       fs.writeFileSync('./chrome-app/main.js', chromeAppTpl.main);
       fs.writeFileSync('./chrome-app/manifest.json', chromeAppTpl.manifest(permissions));
     }
-  }
-}
+  };
+};

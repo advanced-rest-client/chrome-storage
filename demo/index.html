@@ -23,7 +23,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
   body {
     overflow: auto;
   }
-
+  
   .panel-settings {
     @apply(--layout-vertical);
     @apply(--layout-center);
@@ -38,18 +38,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <body>
   <div class="vertical-section vertical-section-container centered">
     <template is="dom-bind">
-
       <chrome-storage id="storageLocal" storage="local" name="{{name}}" value="{{value}}" on-value-changed="onaValueChanged" on-error="onError" on-bytes-used="onBytesUsed" on-saved="onSaved" on-removed="onRemoved" on-clear="onCleared"></chrome-storage>
       <chrome-storage id="storageSync" storage="sync" name="{{name}}" value="{{value}}" on-value-changed="onaValueChanged" on-error="onError" on-bytes-used="onBytesUsed" on-saved="onSaved" on-removed="onRemoved" on-clear="onCleared"></chrome-storage>
-
       <p>Use chrome storage using <code>Chrome storage API</code>.</p>
       <section class="panel-settings">
-
         <paper-input-container>
           <label>Storage key</label>
           <input is="iron-input" type="text" value="{{name::input}}" placeholder="Key name">
         </paper-input-container>
-
         <paper-input-container>
           <label>Value</label>
           <input is="iron-input" type="text" value="{{value::input}}" placeholder="Value">

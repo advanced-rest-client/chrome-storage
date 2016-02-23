@@ -8,7 +8,10 @@ function lint() {
   return gulp.src([
       './**/*.js',
       './**/*.html',
-      '!./node_modules/**/*.*'
+      '!./node_modules/**/*.*',
+      '!./bower_components/**/*.*',
+      '!./demo-app/**/*.*',
+      '!./test-app/**/*.*'
     ])
     // JSCS has not yet a extract option
     .pipe($.if('*.html', $.htmlExtract({
