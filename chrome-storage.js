@@ -146,6 +146,7 @@ Polymer({
       this.auto = false;
       this.set('value', value);
       this.auto = auto;
+      this.fire('read');
     }.bind(this));
   },
   /**
