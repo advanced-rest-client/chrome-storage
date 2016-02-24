@@ -146,7 +146,7 @@ Polymer({
         return;
       }
       if (this.debug) {
-        console.error('Read response:', value);
+        console.log('Read response (raw):', Object.assign({}, value));
       }
       if (typeof name === 'string') {
         let _arr = _.toPath(name);
@@ -160,8 +160,13 @@ Polymer({
         });
         value = tmp;
       }
-
+      if (this.debug) {
+        console.log('Read response (parsed):', Object.assign({}, value));
+      }
       value = this._wrapValue(value);
+      if (this.debug) {
+        console.log('Read response (wrapped):', Object.assign({}, value));
+      }
       // preventing auto save on read;
       var auto = this.auto;
       this.auto = false;
