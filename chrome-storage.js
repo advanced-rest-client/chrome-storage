@@ -96,6 +96,11 @@ Polymer({
      */
     valueAs: {
       type: String
+    },
+
+    debug: {
+      type: Boolean,
+      value: false
     }
   },
   observers: [
@@ -103,11 +108,17 @@ Polymer({
   ],
   _nameChanged: function() {
     if (this.auto && this.name) {
+      if (this.debug) {
+        console.log('Auto read invoced.');
+      }
       this.read();
     }
   },
   _valueChanged: function() {
     if (this.auto) {
+      if (this.debug) {
+        console.log('Auto save invoced.');
+      }
       this.store();
     }
   },
@@ -123,10 +134,19 @@ Polymer({
     } else {
       obj = name;
     }
+    if (this.debug) {
+      console.log('Attempting to read an object.', obj);
+    }
     chrome.storage[this.storage].get(obj, function(value) {
       if (chrome.runtime.lastError) {
+        if (this.debug) {
+          console.error('Read error.', chrome.runtime.lastError);
+        }
         this.fire('error', chrome.runtime.lastError);
         return;
+      }
+      if (this.debug) {
+        console.error('Read response:', value);
       }
       if (typeof name === 'string') {
         let _arr = _.toPath(name);
@@ -140,6 +160,7 @@ Polymer({
         });
         value = tmp;
       }
+
       value = this._wrapValue(value);
       // preventing auto save on read;
       var auto = this.auto;
@@ -156,6 +177,9 @@ Polymer({
    * total usage of all of storage.
    */
   getBytesInUse: function() {
+    if (this.debug) {
+      console.error('Running  get bytes in use');
+    }
     chrome.storage[this.storage].getBytesInUse(this.name, (bytesInUse) => {
       if (chrome.runtime.lastError) {
         this.fire('error', chrome.runtime.lastError);
@@ -178,16 +202,28 @@ Polymer({
    * the value will be transformed to object where path is a `this.name`.
    */
   store: function() {
+    if (this.debug) {
+      console.log('Running store function.');
+    }
     var value = {};
     if (typeof this.name === 'string') {
       value = this._getDataObject(this.value);
     } else {
       value = this.value;
     }
+    if (this.debug) {
+      console.log('Value to store ready', Object.assign({}, value));
+    }
     chrome.storage[this.storage].set(value, () => {
       if (chrome.runtime.lastError) {
+        if (this.debug) {
+          console.error('Store error.', chrome.runtime.lastError);
+        }
         this.fire('error', chrome.runtime.lastError);
         return;
+      }
+      if (this.debug) {
+        console.log('Store successful');
       }
       this.fire('saved');
     });
@@ -204,7 +240,13 @@ Polymer({
       });
       return;
     }
+    if (this.debug) {
+      console.log('Removing the object');
+    }
     chrome.storage[this.storage].remove(name, () => {
+      if (this.debug) {
+        console.log('Remove successful');
+      }
       this.fire('removed');
     });
   },
@@ -212,7 +254,13 @@ Polymer({
    * Removes all items from storage.
    */
   clear: function() {
+    if (this.debug) {
+      console.log('Clearing storage');
+    }
     chrome.storage[this.storage].clear(() => {
+      if (this.debug) {
+        console.log('Storage cleared');
+      }
       this.fire('clear');
     });
   },
