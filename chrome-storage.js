@@ -358,7 +358,11 @@ Polymer({
     if (window[fnName].constructor) {
       try {
         inst = new window[fnName](value);
-      } catch (e) {}
+      } catch (e) {
+        if (this.debug) {
+          console.error(e);
+        }
+      }
     } else {
       inst = window[fnName](value);
     }

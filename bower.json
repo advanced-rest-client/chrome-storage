@@ -1,6 +1,6 @@
 {
   "name": "chrome-storage",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "license": "LICENSE.txt",
   "description": "A Chrome storage API in a web component.",
   "authors": [
