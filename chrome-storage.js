@@ -1,3 +1,4 @@
+(function() {
 'use strict';
 /* global _ */
 Polymer({
@@ -378,3 +379,4 @@ Polymer({
     return inst;
   }
 });
+})();
