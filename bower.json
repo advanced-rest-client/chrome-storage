@@ -6,6 +6,7 @@
   "authors": [
     "Pawel Psztyc"
   ],
+  "main": "chrome-storage.html",
   "homepage": "https://github.com/jarrodek/chrome-storage",
   "repository": {
     "type": "git",
