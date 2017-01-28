@@ -31,12 +31,12 @@ Example:
 ### Events
 | Event | Description | Parameters |
 | --- | --- | --- |
-| `read` | Fired when data was read from the storage. Read data is accessible via `value` property | _none_ |
-| `error` | Fired when error occurred | - `String` message - Error message |
-| `clear` | Fired when the store has been cleared | _none_ |
-| `bytes-used` | Fired when store data usage has been read. | - `Number` bytes - Number of bytes used by the given key or whole storage |
-| `saved` | Fired when data has been stored into the store. | _none_ |
-| `removed` | Fired when data has been removed from the store. | _none_ |
+| `chrome-storage-read` | Fired when data was read from the storage. Read data is accessible via `value` property | _none_ |
+| `chrome-storage-error` | Fired when error occurred | - `String` message - Error message |
+| `chrome-storage-clear` | Fired when the store has been cleared | _none_ |
+| `chrome-storage-bytes-used` | Fired when store data usage has been read. | - `Number` bytes - Number of bytes used by the given key or whole storage |
+| `chrome-storage-saved` | Fired when data has been stored into the store. | _none_ |
+| `chrome-storage-removed` | Fired when data has been removed from the store. | _none_ |
 
 ### Properties
 | Property | Description | Type | Default |
@@ -45,7 +45,7 @@ Example:
 | name | A property name to observe. A name can be either key name or a path to the key. For example `path.to.my.0.key` is valid path. | String | _none_ |
 | value | Value read from the store or to be set in store. Chrome storage can store any serializable object. | String or Object or Number or Boolean | _none_ |
 | auto | True when value change should save data automatically. | Boolean | `false` |
-| defaultValue | A default value to read from the storage for given key. | String or Object or Number or Boolean | _none_ |
+| defaultValue | A default value to read from the storage for given key. | String or Object or Number or Boolean. It's default to null because chrome.storage returns undefined if the default value for the key is undefined, even if there's actually a value. | `null` |
 | valueAs | If set, it must be a valid function name. It will be called to wrap the object with. | String | _none_ |
 
 ### Methods
