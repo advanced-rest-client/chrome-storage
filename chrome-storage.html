@@ -468,6 +468,9 @@ This function fires `clear` event.
      * @return {Object} An object created from path in `this.name` and predefined value.
      */
     _getDataObject: function(value) {
+      if (value === null) {
+        return null;
+      }
       return this._setPathValue({}, this.name, value);
     },
     /**
