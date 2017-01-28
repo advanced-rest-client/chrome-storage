@@ -16,51 +16,88 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
   <link rel="import" href="../../paper-styles/paper-styles.html">
   <link rel="import" href="../../paper-styles/demo-pages.html">
   <link rel="import" href="../../paper-button/paper-button.html">
-  <link rel="import" href="../../paper-input/paper-input-container.html">
+  <link rel="import" href="../../paper-input/paper-input.html">
   <link rel="import" href="../chrome-storage.html">
   <style is="custom-style">
   html,
   body {
     overflow: auto;
   }
-  
+
   .panel-settings {
     @apply(--layout-vertical);
-    @apply(--layout-center);
   }
 
   .logs div {
     padding: 8px;
   }
+
+  .table {
+    margin-top: 20px;
+    @apply(--layout-vertical);
+  }
+
+  .row {
+    @apply(--layout-horizontal);
+    @apply(--layout-center);
+    margin: 4px 0;
+  }
+
+  .row > span {
+    @apply(--layout-flex);
+  }
+
+  paper-button[data-area="local"] {
+    background-color: #4CAF50;
+    color: #fff;
+  }
+
+  paper-button[data-area="sync"] {
+    background-color: #FFC107;
+  }
   </style>
 </head>
 
 <body>
-  <div class="vertical-section vertical-section-container centered">
-    <template is="dom-bind">
-      <chrome-storage id="storageLocal" storage="local" name="{{name}}" value="{{value}}" on-value-changed="onaValueChanged" on-error="onError" on-bytes-used="onBytesUsed" on-saved="onSaved" on-removed="onRemoved" on-clear="onCleared"></chrome-storage>
-      <chrome-storage id="storageSync" storage="sync" name="{{name}}" value="{{value}}" on-value-changed="onaValueChanged" on-error="onError" on-bytes-used="onBytesUsed" on-saved="onSaved" on-removed="onRemoved" on-clear="onCleared"></chrome-storage>
+  <template is="dom-bind" id="app">
+    <div class="vertical-section vertical-section-container centered">
       <p>Use chrome storage using <code>Chrome storage API</code>.</p>
       <section class="panel-settings">
-        <paper-input-container>
-          <label>Storage key</label>
-          <input is="iron-input" type="text" value="{{name::input}}" placeholder="Key name">
-        </paper-input-container>
-        <paper-input-container>
-          <label>Value</label>
-          <input is="iron-input" type="text" value="{{value::input}}" placeholder="Value">
-        </paper-input-container>
-        <!-- action buttons -->
-        <paper-button on-click="setLocal">Set local</paper-button>
-        <paper-button on-click="setSync">Set sync</paper-button>
-        <paper-button on-click="getLocal">Get local</paper-button>
-        <paper-button on-click="getSync">Get sync</paper-button>
-        <paper-button on-click="getUsageLocal">Get local usage</paper-button>
-        <paper-button on-click="getUsageSync">Get sync usage</paper-button>
-        <paper-button on-click="removeLocal">Remove local</paper-button>
-        <paper-button on-click="removeSync">Remove sync</paper-button>
-        <paper-button on-click="clearLocal">Clear local</paper-button>
-        <paper-button on-click="clearSync">Clear sync</paper-button>
+        <paper-input value="{{name}}" label="Key"></paper-input>
+        <paper-input value="{{value}}" label="Value"></paper-input>
+
+        <div class="table">
+          <div class="row">
+            <span id="dataset">Set data</span>
+            <paper-button aria-describedby="dataset" data-area="local" on-tap="setValue">local</paper-button>
+            <paper-button aria-describedby="dataset" data-area="sync" on-tap="setValue">sync</paper-button>
+          </div>
+
+          <div class="row">
+            <span id="dataget">Get stored data</span>
+            <paper-button aria-describedby="dataget" data-area="local" on-tap="getValue">local</paper-button>
+            <paper-button aria-describedby="dataget" data-area="sync" on-tap="getValue">sync</paper-button>
+          </div>
+
+          <div class="row">
+            <span id="dataused">Get storage data usage for given key</span>
+            <paper-button aria-describedby="dataused" data-area="local" on-tap="getUsage">local</paper-button>
+            <paper-button aria-describedby="dataused" data-area="sync" on-tap="getUsage">sync</paper-button>
+          </div>
+
+          <div class="row">
+            <span id="dataremove">Remove value for given key</span>
+            <paper-button aria-describedby="dataremove" data-area="local" on-tap="removeData">local</paper-button>
+            <paper-button aria-describedby="dataremove" data-area="sync" on-tap="removeData">sync</paper-button>
+          </div>
+
+          <div class="row">
+            <span id="dataclear">Clear storage</span>
+            <paper-button aria-describedby="dataclear" data-area="local" on-tap="clearArea">local</paper-button>
+            <paper-button aria-describedby="dataclear" data-area="sync" on-tap="clearArea">sync</paper-button>
+          </div>
+        </div>
+
       </section>
       <section class="logs">
         <h2>Log</h2>
@@ -70,77 +107,91 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           </div>
         </template>
       </section>
-    </template>
-  </div>
+    </div>
+
+    <chrome-storage id="storageLocal" debug storage="local" name="{{name}}" value="{{value}}" on-chrome-storage-read="storageRead" on-chrome-storage-error="onError" on-chrome-storage-bytes-used="onBytesUsed" on-chrome-storage-saved="onSaved" on-chrome-storage-removed="onRemoved" on-chrome-storage-clear="onCleared"></chrome-storage>
+    <chrome-storage id="storageSync" debug storage="sync" name="{{name}}" value="{{value}}" on-chrome-storage-read="storageRead" on-chrome-storage-error="onError" on-chrome-storage-bytes-used="onBytesUsed" on-chrome-storage-saved="onSaved" on-chrome-storage-removed="onRemoved" on-chrome-storage-clear="onCleared"></chrome-storage>
+  </template>
   <script>
-  var demo = document.querySelector('template');
-  demo.logs = [];
-  demo.name = undefined;
-  demo.value = undefined;
-  demo.setLocal = () => {
-    demo.$.storageLocal.store();
-  };
-  demo.setSync = () => {
-    demo.$.storageSync.store();
-  };
-  demo.getLocal = () => {
-    demo.$.storageLocal.read();
-  };
-  demo.getSync = () => {
-    demo.$.storageSync.read();
-  };
-  demo.getUsageLocal = () => {
-    demo.$.storageLocal.getBytesInUse();
-  };
-  demo.getUsageSync = () => {
-    demo.$.storageSync.getBytesInUse();
-  };
-  demo.removeLocal = () => {
-    demo.$.storageLocal.remove();
-  };
-  demo.removeSync = () => {
-    demo.$.storageSync.remove();
-  };
-  demo.clearLocal = () => {
-    demo.$.storageLocal.clear();
-  };
-  demo.clearSync = () => {
-    demo.$.storageSync.clear();
-  };
-  demo.onaValueChanged = function(e) {
-    demo.push('logs', {
-      log: 'Value changed to: "' + e.detail.value + '"'
+  (function(app) {
+    app.logs = [];
+    app.name = undefined;
+    app.value = undefined;
+    app.setValue = function(e) {
+      let area = e.target.dataset.area;
+      if (area === 'local') {
+        app.$.storageLocal.store();
+      } else {
+        app.$.storageSync.store();
+      }
+    };
+    app.getValue = function(e) {
+      let area = e.target.dataset.area;
+      if (area === 'local') {
+        app.$.storageLocal.read();
+      } else {
+        app.$.storageSync.read();
+      }
+    };
+    app.getUsage = function(e) {
+      let area = e.target.dataset.area;
+      if (area === 'local') {
+        app.$.storageLocal.getBytesInUse();
+      } else {
+        app.$.storageSync.getBytesInUse();
+      }
+    };
+    app.removeData = function(e) {
+      let area = e.target.dataset.area;
+      if (area === 'local') {
+        app.$.storageLocal.remove();
+      } else {
+        app.$.storageSync.remove();
+      }
+    };
+    app.clearArea = function(e) {
+      let area = e.target.dataset.area;
+      if (area === 'local') {
+        app.$.storageLocal.clear();
+      } else {
+        app.$.storageSync.clear();
+      }
+    };
+    app.storageRead = function(e) {
+      app.push('logs', {
+        log: `Value on store ${e.detail.storage} changed to: ${e.detail.value}`
+      });
+    };
+    app.onError = function(e) {
+      app.push('logs', {
+        log: 'Error performing an operation: ' + e.message
+      });
+    };
+    app.onBytesUsed = function(e) {
+      app.push('logs', {
+        log: 'Bytes used: ' + e.detail.bytes
+      });
+    };
+    app.onSaved = function(e) {
+      app.push('logs', {
+        log: 'Data saved.'
+      });
+    };
+    app.onRemoved = function(e) {
+      app.push('logs', {
+        log: 'Data removed.'
+      });
+    };
+    app.onCleared = function(e) {
+      app.push('logs', {
+        log: 'Storage cleared.'
+      });
+    };
+    app.addEventListener('dom-change', function() {
+      app.set('name', 'my.happy.key.has.value');
+      app.set('value', 'Happy value');
     });
-  };
-  demo.onError = function(e) {
-    demo.push('logs', {
-      log: 'Error performing an operation: ' + e.message
-    });
-  };
-  demo.onBytesUsed = function(e) {
-    demo.push('logs', {
-      log: 'Bytes used: ' + e.detail.bytes
-    });
-  };
-  demo.onSaved = function(e) {
-    demo.push('logs', {
-      log: 'Data saved.'
-    });
-  };
-  demo.onRemoved = function(e) {
-    demo.push('logs', {
-      log: 'Data removed.'
-    });
-  };
-  demo.onCleared = function(e) {
-    demo.push('logs', {
-      log: 'Storage cleared.'
-    });
-  };
-  demo.addEventListener('dom-change', function() {
-    demo.set('name', 'my.happy.key.has.value');
-    demo.set('value', 'Happy value');
-  });
+  })(document.querySelector('#app'));
   </script>
 </body>
 
