@@ -17,8 +17,7 @@
   ],
   "private": false,
   "dependencies": {
-    "polymer": "Polymer/polymer#^1.2.0",
-    "lodash": "lodash/lodash#^*"
+    "polymer": "Polymer/polymer#^1.2.0"
   },
   "devDependencies": {
     "iron-component-page": "PolymerElements/iron-component-page#^1.0.5",
