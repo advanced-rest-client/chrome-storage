@@ -468,9 +468,6 @@ This function fires `clear` event.
      * @return {Object} An object created from path in `this.name` and predefined value.
      */
     _getDataObject: function(value) {
-      if (value === null || value === undefined) {
-        return null;
-      }
       return this._setPathValue({}, this.name, value);
     },
     /**
@@ -481,8 +478,17 @@ This function fires `clear` event.
       var propNames = this._toPath(propString);
       var propLength = propNames.length - 1;
       var tmpObj = obj;
-      for (var i = 0; i <= propLength; i++) {
-        tmpObj = tmpObj[propNames[i]] = i !== propLength ? {} : value;
+      for (let i = 0; i <= propLength; i++) {
+        let assignValue;
+        if (i === propLength) {
+          assignValue = value;
+          if (assignValue === undefined) {
+            assignValue = null;
+          }
+        } else {
+          assignValue = {};
+        }
+        tmpObj = tmpObj[propNames[i]] = assignValue;
       }
       return obj;
     },
